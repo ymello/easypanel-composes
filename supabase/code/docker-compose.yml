@@ -463,6 +463,9 @@ services:
       - POOLER_POOL_MODE=transaction
     volumes:
       - ./volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro
+    ports:
+      - "5433:5432"
+      - "6543:6543"
 
 volumes:
   db-config:
