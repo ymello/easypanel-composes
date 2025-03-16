@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: bitnami/postgresql:15
+    environment:
+      POSTGRESQL_DATABASE: woofedcrm
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: "Qx7t2P5fRz9L8dA3vB6eC1"
+    volumes:
+      - woofed_postgres_data:/bitnami/postgresql
+    networks:
+      - woofed_network
+
+  redis:
+    image: redis:latest
+    command: redis-server --appendonly yes
+    volumes:
+      - woofed_redis_data:/data
+    networks:
+      - woofed_network
+
+  woofedcrm:
+    image: douglara/woofedcrm:latest
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      RAILS_ENV: production
+      DATABASE_URL: postgresql://postgres:Qx7t2P5fRz9L8dA3vB6eC1@postgres:5432/woofedcrm
+      REDIS_URL: redis://redis:6379/0
+      FRONTEND_URL: https://seudominio.com.br
+      MOTOR_AUTH_USERNAME: admin
+      MOTOR_AUTH_PASSWORD: "K3jS9pV8mZ4xT2qW7rY5dE"
+    ports:
+      - "3030:3000"
+    volumes:
+      - woofed_app_data:/app
+    networks:
+      - woofed_network
+    command: bundle exec rails s -b 0.0.0.0
+
+volumes:
+  woofed_postgres_data:
+    name: woofed_postgres_data
+  woofed_redis_data:
+    name: woofed_redis_data
+  woofed_app_data:
+    name: woofed_app_data
+
+networks:
+  woofed_network:
+    name: woofed_network
+    driver: bridge
